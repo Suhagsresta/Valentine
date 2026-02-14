@@ -46,36 +46,43 @@ body{
 
 /* MAIN CARD */
 .card{
- max-width:900px;
- margin:60px auto;
- padding:30px;
+ max-width:1100px;
+ margin:40px auto;
+ padding:20px;
  text-align:center;
 }
 
-/* BIG BOUQUET IMAGE */
+/* BIG BOUQUET IMAGE (AUTO-FITS roses.jpg EXACTLY) */
 .bouquet{
- position:relative;
- width:100%;
- border-radius:18px;
- overflow:hidden;
- box-shadow:0 25px 80px rgba(255,45,85,.25);
+  position:relative;
+  width:100%;
+  max-height:70vh;
+  margin:0 auto;
+  border-radius:18px;
+  overflow:hidden;
+  box-shadow:0 25px 80px rgba(255,45,85,.25);
+  background: radial-gradient(circle at 30% 30%, rgba(255,45,85,.12), rgba(0,0,0,.75));
+
+  /* modern browsers: will be set via JS to match the image */
+  aspect-ratio: var(--ar, 3 / 2);
 }
 
+/* fallback for older browsers: height comes from padding-top */
 .bouquet::before{
- content:"";
- display:block;
- padding-top:56.25%;
- background: radial-gradient(circle at 30% 30%, rgba(255,45,85,.15), rgba(0,0,0,.7));
+  content:"";
+  display:block;
+  padding-top: var(--pt, 66.6667%);
 }
 
 .bouquet img{
- position:absolute;
- inset:0;
- width:100%;
- height:100%;
- object-fit:cover;
- opacity:0;
- transition:opacity 1.4s ease;
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:contain;   /* <-- NO CROPPING */
+  object-position:center;
+  opacity:0;
+  transition:opacity 1.2s ease;
 }
 
 /* PETALS */
@@ -95,7 +102,7 @@ body{
 }
 
 button{
- margin-top:25px;
+ margin-top:22px;
  padding:14px 26px;
  font-size:18px;
  border:none;
@@ -111,26 +118,25 @@ button{
 <body>
 
 <div id="loader">
-<h2>Preparing your bouquet… 🌹</h2>
-<div class="barwrap"><div class="bar" id="bar"></div></div>
+  <h2>Preparing your bouquet… 🌹</h2>
+  <div class="barwrap"><div class="bar" id="bar"></div></div>
 </div>
 
 <div class="card">
+  <h1>Open your surprise</h1>
 
-<h1>Open your surprise</h1>
+  <div class="bouquet" id="bouquetFrame">
+    <img id="roseImg" src="./roses.jpg" alt="Bouquet of red roses">
+  </div>
 
-<div class="bouquet">
-<img id="roseImg" src="./roses.jpg" alt="Bouquet of 15 red roses">
-</div>
-
-<button onclick="window.location.href='call.html'">Answer your surprise 💌</button>
-
+  <button onclick="window.location.href='call.html'">Answer your surprise 💌</button>
 </div>
 
 <script>
-const loader=document.getElementById("loader");
-const bar=document.getElementById("bar");
-const img=document.getElementById("roseImg");
+const loader  = document.getElementById("loader");
+const bar     = document.getElementById("bar");
+const img     = document.getElementById("roseImg");
+const frame   = document.getElementById("bouquetFrame");
 
 let progress=0;
 let finished=false;
@@ -142,23 +148,40 @@ const timer=setInterval(()=>{
   bar.style.width=progress+"%";
 },180);
 
+function setFrameToImageAspect(){
+  if(!img.naturalWidth || !img.naturalHeight) return;
+
+  // set modern aspect-ratio (best)
+  frame.style.setProperty("--ar", `${img.naturalWidth} / ${img.naturalHeight}`);
+
+  // set fallback padding-top (for older browsers)
+  const pt = (img.naturalHeight / img.naturalWidth) * 100;
+  frame.style.setProperty("--pt", pt.toFixed(4) + "%");
+}
+
 /* finish function — GUARANTEED to run */
 function finish(){
- if(finished) return;
- finished=true;
- clearInterval(timer);
- bar.style.width="100%";
+  if(finished) return;
+  finished=true;
+  clearInterval(timer);
+  bar.style.width="100%";
 
- setTimeout(()=>{
-   loader.style.opacity="0";
-   setTimeout(()=>loader.style.display="none",600);
-   img.style.opacity=1;
-   createPetals();
- },600);
+  setTimeout(()=>{
+    loader.style.opacity="0";
+    setTimeout(()=>loader.style.display="none",600);
+
+    setFrameToImageAspect();     // <-- makes frame match roses.jpg exactly
+    img.style.opacity=1;
+
+    createPetals();
+  },600);
 }
 
 /* image loads normally */
-img.onload=finish;
+img.onload=()=>{
+  setFrameToImageAspect();
+  finish();
+};
 
 /* if image fails OR GitHub slow → still finish */
 img.onerror=finish;
@@ -168,14 +191,14 @@ setTimeout(finish,3200);
 
 /* petals */
 function createPetals(){
- for(let i=0;i<20;i++){
-  let p=document.createElement("div");
-  p.className="petal";
-  p.style.left=Math.random()*100+"vw";
-  p.style.animationDuration=6+Math.random()*6+"s";
-  p.style.opacity=Math.random();
-  document.body.appendChild(p);
- }
+  for(let i=0;i<20;i++){
+    let p=document.createElement("div");
+    p.className="petal";
+    p.style.left=Math.random()*100+"vw";
+    p.style.animationDuration=6+Math.random()*6+"s";
+    p.style.opacity=Math.random();
+    document.body.appendChild(p);
+  }
 }
 </script>
 
