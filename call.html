@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Incoming Call 💗</title>
+  <style>
+    :root{
+      --bg:#050207;
+      --rose:#ff2d55;
+      --soft:#ffd6de;
+      --card: rgba(255,255,255,0.06);
+      --border: rgba(255,255,255,0.14);
+      --shadow: 0 22px 70px rgba(0,0,0,0.6);
+    }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      background:
+        radial-gradient(1100px 700px at 40% 10%, rgba(255,45,85,0.18), transparent 60%),
+        radial-gradient(900px 600px at 90% 30%, rgba(255,214,222,0.10), transparent 55%),
+        linear-gradient(180deg, #040106, #0c0410);
+      color:#fff;
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:22px;
+      overflow:hidden;
+    }
+
+    /* floating hearts */
+    .hearts{ position:fixed; inset:0; pointer-events:none; opacity:.22; }
+    .heart{
+      position:absolute; width:14px; height:14px;
+      transform: rotate(45deg);
+      background: rgba(255,45,85,0.60);
+      border-radius: 3px;
+      animation: floatUp linear infinite;
+      filter: blur(.1px);
+    }
+    .heart:before,.heart:after{
+      content:"";
+      position:absolute; width:14px; height:14px;
+      background: inherit;
+      border-radius: 50%;
+    }
+    .heart:before{ left:-7px; top:0; }
+    .heart:after{ left:0; top:-7px; }
+    @keyframes floatUp{
+      from{ transform: translateY(50px) rotate(45deg); opacity:0; }
+      10%{ opacity:.9; }
+      to{ transform: translateY(-110vh) rotate(45deg); opacity:0; }
+    }
+
+    .wrap{
+      width:min(520px, 100%);
+      background: var(--card);
+      border:1px solid var(--border);
+      border-radius: 26px;
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      position:relative;
+    }
+
+    .top{
+      padding:22px 22px 12px 22px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+    }
+    .tag{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      padding:10px 14px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,0.16);
+      background: rgba(0,0,0,0.16);
+      user-select:none;
+    }
+    .dot{
+      width:10px;height:10px;border-radius:999px;
+      background: var(--rose);
+      box-shadow: 0 0 18px rgba(255,45,85,0.75);
+    }
+
+    .screen{
+      padding: 8px 22px 22px 22px;
+      text-align:center;
+    }
+
+    .name{
+      font-size: 26px;
+      margin: 8px 0 4px 0;
+      letter-spacing:.2px;
+    }
+    .status{
+      color: rgba(255,255,255,0.78);
+      margin:0 0 18px 0;
+    }
+
+    /* pulsing call ring */
+    .avatar{
+      width:110px; height:110px;
+      margin: 10px auto 18px auto;
+      border-radius: 999px;
+      background:
+        radial-gradient(circle at 30% 25%, rgba(255,214,222,0.75), rgba(255,45,85,0.55)),
+        radial-gradient(circle at 70% 70%, rgba(255,45,85,0.25), rgba(0,0,0,0));
+      border: 1px solid rgba(255,255,255,0.16);
+      box-shadow: 0 0 0 0 rgba(255,45,85,0.35);
+      animation: pulse 1.35s ease-in-out infinite;
+      position:relative;
+    }
+    .avatar:after{
+      content:"☎";
+      position:absolute; inset:0;
+      display:flex; align-items:center; justify-content:center;
+      font-size: 40px;
+      opacity:.92;
+      text-shadow: 0 0 24px rgba(255,214,222,0.25);
+    }
+    @keyframes pulse{
+      0%{ box-shadow: 0 0 0 0 rgba(255,45,85,0.35); transform: scale(1); }
+      70%{ box-shadow: 0 0 0 22px rgba(255,45,85,0.0); transform: scale(1.02); }
+      100%{ box-shadow: 0 0 0 0 rgba(255,45,85,0.0); transform: scale(1); }
+    }
+
+    .btnRow{
+      display:flex;
+      gap:12px;
+      justify-content:center;
+      margin-top: 10px;
+      flex-wrap:wrap;
+    }
+
+    button{
+      border:0;
+      border-radius: 999px;
+      padding: 14px 18px;
+      font-size: 16px;
+      cursor:pointer;
+      min-width: 160px;
+      font-weight:650;
+      letter-spacing:.2px;
+    }
+    .answer{
+      background: linear-gradient(135deg, rgba(36, 214, 122, 1), rgba(20, 170, 100, 1));
+      color:#07140c;
+      box-shadow: 0 14px 46px rgba(36,214,122,0.20);
+    }
+    .decline{
+      background: linear-gradient(135deg, rgba(255,45,85,1), rgba(255,122,149,0.85));
+      color:#fff;
+      box-shadow: 0 14px 46px rgba(255,45,85,0.22);
+    }
+
+    .hint{
+      margin-top:14px;
+      color: rgba(255,255,255,0.76);
+      font-size: 14px;
+      line-height:1.45;
+    }
+
+    /* full screen tap overlay (autoplay policies) */
+    .overlay{
+      position:fixed; inset:0;
+      background: rgba(0,0,0,0.72);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:22px;
+      z-index:50;
+    }
+    .overlayCard{
+      width:min(520px, 100%);
+      border-radius: 26px;
+      border:1px solid rgba(255,255,255,0.16);
+      background: rgba(255,255,255,0.06);
+      box-shadow: var(--shadow);
+      padding: 22px;
+      text-align:center;
+    }
+    .overlayTitle{
+      font-size: 20px;
+      margin: 0 0 8px 0;
+    }
+    .overlayText{
+      margin: 0 0 16px 0;
+      color: rgba(255,255,255,0.78);
+      line-height:1.45;
+    }
+    .bigTap{
+      width:100%;
+      padding: 14px 16px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, rgba(255,45,85,1), rgba(255,122,149,0.85));
+      color:#fff;
+      font-size: 16px;
+      font-weight: 700;
+      cursor:pointer;
+      border:0;
+      box-shadow: 0 18px 58px rgba(255,45,85,0.25);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="hearts" aria-hidden="true" id="hearts"></div>
+
+  <!-- Tap overlay (required so sound can start on iPhone) -->
+  <div class="overlay" id="overlay">
+    <div class="overlayCard">
+      <div class="overlayTitle">One more tap 💗</div>
+      <p class="overlayText">
+        Tap below to start the “incoming call” sound.
+        (Phones block autoplay — this makes it work.)
+      </p>
+      <button class="bigTap" id="startBtn" type="button">Tap to start the call</button>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="top">
+      <div class="tag"><span class="dot"></span><span>Incoming call…</span></div>
+      <div style="opacity:.7; font-size:14px;" id="time"></div>
+    </div>
+
+    <div class="screen">
+      <div class="avatar" aria-hidden="true"></div>
+      <div class="name">Your Valentine</div>
+      <p class="status" id="status">Ringing…</p>
+
+      <div class="btnRow">
+        <button class="answer" id="answerBtn" type="button">Answer</button>
+        <button class="decline" id="declineBtn" type="button">Decline</button>
+      </div>
+
+      <div class="hint" id="hint">
+        If you’re on a phone, you might feel vibration too 😉
+      </div>
+    </div>
+  </div>
+
+<script>
+  // Hearts
+  (function(){
+    const wrap = document.getElementById('hearts');
+    const n = 18;
+    for(let i=0;i<n;i++){
+      const h = document.createElement('div');
+      h.className = 'heart';
+      const left = Math.random()*100;
+      const dur = 8 + Math.random()*10;
+      const delay = Math.random()*6;
+      const size = 10 + Math.random()*10;
+      h.style.left = left + 'vw';
+      h.style.bottom = (-10 - Math.random()*30) + 'px';
+      h.style.animationDuration = dur + 's';
+      h.style.animationDelay = delay + 's';
+      h.style.width = size + 'px';
+      h.style.height = size + 'px';
+      wrap.appendChild(h);
+    }
+  })();
+
+  // clock
+  function updateTime(){
+    const d = new Date();
+    const hh = String(d.getHours()).padStart(2,'0');
+    const mm = String(d.getMinutes()).padStart(2,'0');
+    document.getElementById('time').textContent = `${hh}:${mm}`;
+  }
+  updateTime();
+  setInterval(updateTime, 15000);
+
+  // Web Audio "ringtone"
+  let audioCtx, gain, oscA, oscB, ringTimer, vibTimer, ringing = false;
+
+  function startRingtone(){
+    if(ringing) return;
+    ringing = true;
+
+    audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+    gain = audioCtx.createGain();
+    gain.gain.value = 0.0001;
+    gain.connect(audioCtx.destination);
+
+    // Two tones mixed for a “phone-ish” ring
+    oscA = audioCtx.createOscillator();
+    oscB = audioCtx.createOscillator();
+    oscA.type = "sine";
+    oscB.type = "sine";
+    oscA.frequency.value = 440; // A4
+    oscB.frequency.value = 660; // E5-ish
+    oscA.connect(gain);
+    oscB.connect(gain);
+    oscA.start();
+    oscB.start();
+
+    // Ring pattern: ON 1.2s, OFF 1.0s, repeat
+    let on = false;
+    function tick(){
+      if(!ringing) return;
+      on = !on;
+      if(on){
+        gain.gain.cancelScheduledValues(audioCtx.currentTime);
+        gain.gain.setTargetAtTime(0.18, audioCtx.currentTime, 0.02);
+        // little wobble
+        oscA.frequency.setValueAtTime(440, audioCtx.currentTime);
+        oscB.frequency.setValueAtTime(660, audioCtx.currentTime);
+        oscA.frequency.linearRampToValueAtTime(455, audioCtx.currentTime + 0.25);
+        oscB.frequency.linearRampToValueAtTime(640, audioCtx.currentTime + 0.25);
+        document.getElementById('status').textContent = "Ringing…";
+        ringTimer = setTimeout(tick, 1200);
+      } else {
+        gain.gain.cancelScheduledValues(audioCtx.currentTime);
+        gain.gain.setTargetAtTime(0.0001, audioCtx.currentTime, 0.03);
+        document.getElementById('status').textContent = "Incoming call…";
+        ringTimer = setTimeout(tick, 1000);
+      }
+    }
+    tick();
+
+    // Vibration pattern on supported phones
+    function vib(){
+      if(!ringing) return;
+      if(navigator.vibrate){
+        navigator.vibrate([200, 120, 200, 140, 260]);
+      }
+      vibTimer = setTimeout(vib, 2400);
+    }
+    vib();
+  }
+
+  function stopRingtone(){
+    ringing = false;
+    clearTimeout(ringTimer);
+    clearTimeout(vibTimer);
+    try{ if(navigator.vibrate) navigator.vibrate(0); }catch(e){}
+    if(gain && audioCtx){
+      try{ gain.gain.setTargetAtTime(0.0001, audioCtx.currentTime, 0.02); }catch(e){}
+    }
+    try{ if(oscA){ oscA.stop(); oscA.disconnect(); } }catch(e){}
+    try{ if(oscB){ oscB.stop(); oscB.disconnect(); } }catch(e){}
+    oscA = oscB = null;
+  }
+
+  function answered(){
+    stopRingtone();
+    document.getElementById('status').textContent = "Connected 💗";
+    document.getElementById('hint').innerHTML =
+      "Good. Now… <b>answer your phone</b> for real 😉";
+  }
+
+  function declined(){
+    stopRingtone();
+    document.getElementById('status').textContent = "Missed call…";
+    document.getElementById('hint').innerHTML =
+      "You can’t decline me forever 😌<br><span style='opacity:.8'>Refresh to ring again.</span>";
+  }
+
+  // overlay start (needed for audio)
+  document.getElementById('startBtn').addEventListener('click', async () => {
+    const overlay = document.getElementById('overlay');
+    overlay.style.display = 'none';
+    try{
+      if(audioCtx && audioCtx.state === 'suspended') await audioCtx.resume();
+    }catch(e){}
+    startRingtone();
+  });
+
+  document.getElementById('answerBtn').addEventListener('click', answered);
+  document.getElementById('declineBtn').addEventListener('click', declined);
+</script>
+
+</body>
+</html>
