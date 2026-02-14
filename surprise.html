@@ -7,6 +7,7 @@
 
 <style>
 :root{ --rose:#ff2d55; }
+
 body{
   margin:0;
   font-family:system-ui;
@@ -14,44 +15,95 @@ body{
   color:white;
   overflow-x:hidden;
 }
+
+/* LOADER */
 #loader{
-  position:fixed; inset:0;
-  background:#050207;
-  display:flex; align-items:center; justify-content:center; flex-direction:column;
-  z-index:100;
+ position:fixed;
+ inset:0;
+ background:#050207;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ flex-direction:column;
+ z-index:100;
+ transition:opacity .6s ease;
 }
-.barwrap{ width:260px;height:10px;background:#222;border-radius:20px;overflow:hidden;margin-top:15px; }
-.bar{ height:100%;width:0%; background:linear-gradient(90deg,#ff2d55,#ff9bb0); transition:width .2s; }
 
-.card{ max-width:900px; margin:60px auto; padding:30px; text-align:center; }
+.barwrap{
+ width:260px;
+ height:10px;
+ background:#222;
+ border-radius:20px;
+ overflow:hidden;
+ margin-top:15px;
+}
+.bar{
+ height:100%;
+ width:0%;
+ background:linear-gradient(90deg,#ff2d55,#ff9bb0);
+ transition:width .25s;
+}
 
+/* MAIN CARD */
+.card{
+ max-width:900px;
+ margin:60px auto;
+ padding:30px;
+ text-align:center;
+}
+
+/* BIG BOUQUET IMAGE */
 .bouquet{
-  position:relative; width:100%;
-  border-radius:18px; overflow:hidden;
-  box-shadow:0 25px 80px rgba(255,45,85,.25);
+ position:relative;
+ width:100%;
+ border-radius:18px;
+ overflow:hidden;
+ box-shadow:0 25px 80px rgba(255,45,85,.25);
 }
+
 .bouquet::before{
-  content:""; display:block; padding-top:56.25%;
-  background: radial-gradient(circle at 30% 30%, rgba(255,45,85,.18), rgba(0,0,0,.65));
+ content:"";
+ display:block;
+ padding-top:56.25%;
+ background: radial-gradient(circle at 30% 30%, rgba(255,45,85,.15), rgba(0,0,0,.7));
 }
+
 .bouquet img{
-  position:absolute; inset:0;
-  width:100%; height:100%;
-  object-fit:cover;
-  opacity:0;
-  transition:opacity 1.2s ease;
+ position:absolute;
+ inset:0;
+ width:100%;
+ height:100%;
+ object-fit:cover;
+ opacity:0;
+ transition:opacity 1.4s ease;
+}
+
+/* PETALS */
+.petal{
+ position:fixed;
+ width:18px;
+ height:18px;
+ background:radial-gradient(circle,#ff4b6e,#c4002c);
+ border-radius:50% 50% 50% 0;
+ transform:rotate(45deg);
+ animation:fall linear infinite;
+ opacity:.7;
+}
+@keyframes fall{
+ from{transform:translateY(-10vh) rotate(0deg);}
+ to{transform:translateY(110vh) rotate(360deg);}
 }
 
 button{
-  margin-top:25px;
-  padding:14px 26px;
-  font-size:18px;
-  border:none;
-  border-radius:30px;
-  background:linear-gradient(135deg,#ff2d55,#ff7a95);
-  color:white;
-  cursor:pointer;
-  box-shadow:0 10px 40px rgba(255,45,85,.4);
+ margin-top:25px;
+ padding:14px 26px;
+ font-size:18px;
+ border:none;
+ border-radius:30px;
+ background:linear-gradient(135deg,#ff2d55,#ff7a95);
+ color:white;
+ cursor:pointer;
+ box-shadow:0 10px 40px rgba(255,45,85,.4);
 }
 </style>
 </head>
@@ -59,70 +111,72 @@ button{
 <body>
 
 <div id="loader">
-  <h2>Preparing your bouquet… 🌹</h2>
-  <div class="barwrap"><div class="bar" id="bar"></div></div>
+<h2>Preparing your bouquet… 🌹</h2>
+<div class="barwrap"><div class="bar" id="bar"></div></div>
 </div>
 
 <div class="card">
-  <h1>Open your surprise</h1>
 
-  <div class="bouquet">
-    <img id="roseImg"
-      src="./roses.jpg"
-      alt="Bouquet of 15 red roses"
-      decoding="async"
-      loading="eager"
-      fetchpriority="high">
-  </div>
+<h1>Open your surprise</h1>
 
-  <button onclick="window.location.href='call.html'">Answer your surprise 💌</button>
+<div class="bouquet">
+<img id="roseImg" src="./roses.jpg" alt="Bouquet of 15 red roses">
+</div>
+
+<button onclick="window.location.href='call.html'">Answer your surprise 💌</button>
+
 </div>
 
 <script>
-(() => {
-  const loader = document.getElementById("loader");
-  const bar = document.getElementById("bar");
-  const img = document.getElementById("roseImg");
-  if (!loader || !bar || !img) return;
+const loader=document.getElementById("loader");
+const bar=document.getElementById("bar");
+const img=document.getElementById("roseImg");
 
-  // progress animation
-  let p = 0;
-  const timer = setInterval(() => {
-    p += Math.random() * 10;
-    if (p > 95) p = 95;
-    bar.style.width = p + "%";
-  }, 140);
+let progress=0;
+let finished=false;
 
-  let finished = false;
-  function finishLoader() {
-    if (finished) return;
-    finished = true;
-    clearInterval(timer);
-    bar.style.width = "100%";
-    setTimeout(() => loader.style.display = "none", 200);
-  }
+/* romantic fake loading */
+const timer=setInterval(()=>{
+  progress+=Math.random()*7;
+  if(progress>94) progress=94;
+  bar.style.width=progress+"%";
+},180);
 
-  // ✅ hide loader even if DOMContentLoaded already happened
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", () => setTimeout(finishLoader, 600));
-  } else {
-    setTimeout(finishLoader, 600);
-  }
+/* finish function — GUARANTEED to run */
+function finish(){
+ if(finished) return;
+ finished=true;
+ clearInterval(timer);
+ bar.style.width="100%";
 
-  // hard safety timeout
-  setTimeout(finishLoader, 2200);
+ setTimeout(()=>{
+   loader.style.opacity="0";
+   setTimeout(()=>loader.style.display="none",600);
+   img.style.opacity=1;
+   createPetals();
+ },600);
+}
 
-  // image fade in
-  img.addEventListener("load", () => { img.style.opacity = 1; });
-  img.addEventListener("error", () => {
-    // If local image missing, show something instead of blank
-    img.style.opacity = 0;
-    console.warn("roses.jpg not found. Put roses.jpg in same folder as surprise.html");
-  });
+/* image loads normally */
+img.onload=finish;
 
-  // force reload the image src (helps if browser cached a fail)
-  img.src = img.getAttribute("src") + "?v=" + Date.now();
-})();
+/* if image fails OR GitHub slow → still finish */
+img.onerror=finish;
+
+/* safety timeout (prevents stuck forever) */
+setTimeout(finish,3200);
+
+/* petals */
+function createPetals(){
+ for(let i=0;i<20;i++){
+  let p=document.createElement("div");
+  p.className="petal";
+  p.style.left=Math.random()*100+"vw";
+  p.style.animationDuration=6+Math.random()*6+"s";
+  p.style.opacity=Math.random();
+  document.body.appendChild(p);
+ }
+}
 </script>
 
 </body>
