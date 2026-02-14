@@ -107,10 +107,13 @@ button{
 
   <div class="bouquet">
    <img id="roseImg"
-  src="./images/Roses.jpg"
+  src="./images/roses.jpg"
   alt="Bouquet of 15 red roses"
   decoding="async"
-  fetchpriority="high">
+  loading="eager"
+  fetchpriority="high"
+  referrerpolicy="no-referrer">
+
 
 
   </div>
@@ -119,19 +122,71 @@ button{
 </div>
 
 <script>
-const img = document.getElementById("roseImg");
+(() => {
+  const loader = document.getElementById("loader");
+  const bar = document.getElementById("bar");
+  const img = document.getElementById("roseImg");
 
-// If Unsplash blocks the first URL, try a different endpoint automatically
-img.addEventListener("error", () => {
-  // fallback source (often works even when images.unsplash.com is blocked)
-  img.src = "https://source.unsplash.com/1600x900/?red-roses,bouquet";
-});
+  // If loader elements missing, don't block anything
+  if (!loader || !bar || !img) return;
 
-// When it loads, show it
-img.addEventListener("load", () => {
-  img.style.opacity = 1;
-});
+  // Progress animation (visual only)
+  let progress = 0;
+  const timer = setInterval(() => {
+    progress += Math.random() * 10;
+    if (progress > 95) progress = 95;
+    bar.style.width = progress + "%";
+  }, 140);
+
+  let finished = false;
+  function finishLoader() {
+    if (finished) return;
+    finished = true;
+    clearInterval(timer);
+    bar.style.width = "100%";
+    setTimeout(() => (loader.style.display = "none"), 250);
+  }
+
+  // ✅ KEY: Hide loader when DOM is ready (do NOT wait on image)
+  document.addEventListener("DOMContentLoaded", () => {
+    setTimeout(finishLoader, 700);
+  });
+
+  // Hard safety timeout (never get stuck)
+  setTimeout(finishLoader, 2500);
+
+  // ---- Image loading + fallbacks ----
+  const sources = [
+    "./images/roses.jpg", // IMPORTANT: make sure filename matches exactly (case-sensitive on GitHub)
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f6/Rose_bouquet.jpg/1600px-Rose_bouquet.jpg",
+    "https://source.unsplash.com/1600x900/?red-roses,bouquet"
+  ];
+
+  let idx = 0;
+
+  function tryNextSource() {
+    idx++;
+    if (idx < sources.length) {
+      img.src = sources[idx];
+    } else {
+      // nothing worked: keep the nice gradient placeholder and stop
+      console.warn("All bouquet image sources failed.");
+    }
+  }
+
+  img.addEventListener("load", () => {
+    img.style.opacity = 1;
+  });
+
+  img.addEventListener("error", () => {
+    tryNextSource();
+  });
+
+  // Force initial src (in case browser cached an earlier failed src)
+  img.src = sources[0];
+})();
 </script>
+
 
 
 </body>
