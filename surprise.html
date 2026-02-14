@@ -1,448 +1,199 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Your Surprise 🌹</title>
-  <style>
-    :root{
-      --bg1:#07060a;
-      --bg2:#120914;
-      --rose:#ff2d55;
-      --soft:#ffd6de;
-      --card: rgba(255,255,255,0.06);
-      --border: rgba(255,255,255,0.12);
-      --glow: 0 0 28px rgba(255,45,85,0.35);
-      --shadow: 0 18px 60px rgba(0,0,0,0.55);
-      --radius: 22px;
-      --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-    }
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Your Roses 🌹</title>
 
-    *{ box-sizing:border-box; }
-    body{
-      margin:0;
-      font-family:var(--font);
-      color:#fff;
-      background:
-        radial-gradient(1200px 700px at 20% 0%, rgba(255,45,85,0.14), transparent 60%),
-        radial-gradient(900px 600px at 90% 20%, rgba(255,214,222,0.10), transparent 55%),
-        linear-gradient(180deg, var(--bg1), var(--bg2));
-      min-height:100vh;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:22px;
-      overflow-x:hidden;
-    }
+<style>
+:root{
+  --rose:#ff2d55;
+}
 
-    /* subtle floating hearts */
-    .hearts{
-      position:fixed; inset:0; pointer-events:none; opacity:.25; filter: blur(.2px);
-    }
-    .heart{
-      position:absolute;
-      width:14px; height:14px;
-      transform: rotate(45deg);
-      background: rgba(255,45,85,0.55);
-      border-radius: 3px;
-      animation: floatUp linear infinite;
-    }
-    .heart:before,.heart:after{
-      content:"";
-      position:absolute; width:14px; height:14px;
-      background: inherit;
-      border-radius: 50%;
-    }
-    .heart:before{ left:-7px; top:0; }
-    .heart:after{ left:0; top:-7px; }
+body{
+  margin:0;
+  font-family:system-ui;
+  background: radial-gradient(circle at center,#1a0610,#050207);
+  color:white;
+  overflow-x:hidden;
+}
 
-    @keyframes floatUp{
-      from{ transform: translateY(40px) rotate(45deg); opacity:0; }
-      10%{ opacity:.9; }
-      to{ transform: translateY(-110vh) rotate(45deg); opacity:0; }
-    }
+/* LOADER */
+#loader{
+ position:fixed;
+ inset:0;
+ background:#050207;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ flex-direction:column;
+ z-index:100;
+}
 
-    /* card */
-    .card{
-      width:min(940px, 100%);
-      background: var(--card);
-      border:1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      overflow:hidden;
-      position:relative;
-    }
+.barwrap{
+ width:260px;
+ height:10px;
+ background:#222;
+ border-radius:20px;
+ overflow:hidden;
+ margin-top:15px;
+}
 
-    .top{
-      padding:26px 26px 0 26px;
-      display:flex;
-      gap:14px;
-      align-items:center;
-      justify-content:space-between;
-      flex-wrap:wrap;
-    }
-    .badge{
-      display:inline-flex;
-      align-items:center;
-      gap:10px;
-      padding:10px 14px;
-      border:1px solid rgba(255,255,255,0.16);
-      border-radius:999px;
-      background: rgba(0,0,0,0.18);
-      box-shadow: var(--glow);
-      user-select:none;
-    }
-    .dot{
-      width:10px; height:10px;
-      border-radius:999px;
-      background: var(--rose);
-      box-shadow: 0 0 16px rgba(255,45,85,0.7);
-    }
+.bar{
+ height:100%;
+ width:0%;
+ background:linear-gradient(90deg,#ff2d55,#ff9bb0);
+ transition:width .25s;
+}
 
-    .title{
-      font-size: clamp(22px, 3vw, 34px);
-      margin: 6px 0 0 0;
-      letter-spacing: .2px;
-    }
-    .subtitle{
-      margin: 8px 0 0 0;
-      color: rgba(255,255,255,0.72);
-      line-height:1.4;
-      max-width: 62ch;
-    }
+/* MAIN CARD */
+.card{
+ max-width:900px;
+ margin:60px auto;
+ padding:30px;
+ text-align:center;
+}
 
-    .content{
-      padding: 20px 26px 26px 26px;
-      display:grid;
-      grid-template-columns: 1.15fr .85fr;
-      gap:18px;
-    }
+/* BIG BOUQUET IMAGE */
+.bouquet{
+ position:relative;
+ width:100%;
+ border-radius:18px;
+ overflow:hidden;
+ box-shadow:0 25px 80px rgba(255,45,85,.25);
+}
 
-    @media (max-width: 820px){
-      .content{ grid-template-columns: 1fr; }
-    }
+.bouquet img{
+ width:100%;
+ display:block;
+ opacity:0;
+ transition:opacity 1.2s ease;
+}
 
-    .frame{
-      border-radius: 18px;
-      border:1px solid rgba(255,255,255,0.14);
-      overflow:hidden;
-      background: rgba(0,0,0,0.25);
-      position:relative;
-      min-height: 340px;
-    }
-    .frame img{
-      width:100%;
-      height:100%;
-      object-fit: cover;
-      transform: scale(1.02);
-      filter: saturate(1.1) contrast(1.05);
-      display:block;
-      opacity:0;
-      transition: opacity 900ms ease;
-    }
-    .frame .caption{
-      position:absolute;
-      left:14px; right:14px; bottom:14px;
-      padding:12px 14px;
-      border-radius: 14px;
-      background: rgba(0,0,0,0.35);
-      border: 1px solid rgba(255,255,255,0.14);
-      backdrop-filter: blur(10px);
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-    }
-    .caption span{
-      color: rgba(255,255,255,0.85);
-      font-size: 14px;
-      letter-spacing:.2px;
-    }
+/* FALLING PETALS */
+.petal{
+ position:fixed;
+ width:18px;
+ height:18px;
+ background:radial-gradient(circle,#ff4b6e,#c4002c);
+ border-radius:50% 50% 50% 0;
+ transform:rotate(45deg);
+ animation:fall linear infinite;
+ opacity:.7;
+}
 
-    .panel{
-      border-radius: 18px;
-      border:1px solid rgba(255,255,255,0.14);
-      background: rgba(0,0,0,0.18);
-      padding: 18px;
-      display:flex;
-      flex-direction:column;
-      gap:12px;
-      min-height: 340px;
-    }
+@keyframes fall{
+ from{transform:translateY(-10vh) rotate(0deg);}
+ to{transform:translateY(110vh) rotate(360deg);}
+}
 
-    .btn{
-      width:100%;
-      border:0;
-      border-radius: 16px;
-      padding: 14px 16px;
-      font-weight: 650;
-      letter-spacing:.2px;
-      cursor:pointer;
-      background: linear-gradient(135deg, rgba(255,45,85,0.95), rgba(255,110,140,0.85));
-      color:#fff;
-      box-shadow: 0 18px 55px rgba(255,45,85,0.25);
-      transition: transform .12s ease, filter .12s ease;
-    }
-    .btn:hover{ transform: translateY(-1px); filter: brightness(1.05); }
-    .btn:active{ transform: translateY(1px); }
+/* BUTTON */
+button{
+ margin-top:25px;
+ padding:14px 26px;
+ font-size:18px;
+ border:none;
+ border-radius:30px;
+ background:linear-gradient(135deg,#ff2d55,#ff7a95);
+ color:white;
+ cursor:pointer;
+ box-shadow:0 10px 40px rgba(255,45,85,.4);
+}
 
-    .note{
-      padding: 14px 14px;
-      border-radius: 16px;
-      border: 1px dashed rgba(255,214,222,0.35);
-      background: rgba(255,45,85,0.08);
-      color: rgba(255,255,255,0.82);
-      line-height: 1.45;
-      font-size: 14px;
-    }
+/* MESSAGE */
+#message{
+ display:none;
+ margin-top:25px;
+ font-size:20px;
+ line-height:1.6;
+}
 
-    .reveal{
-      display:none;
-      margin-top: 4px;
-      padding: 14px;
-      border-radius: 16px;
-      border: 1px solid rgba(255,255,255,0.14);
-      background: rgba(0,0,0,0.22);
-      box-shadow: 0 0 0 rgba(255,45,85,0.0);
-      animation: pop 420ms ease both;
-    }
-
-    @keyframes pop{
-      from{ transform: translateY(8px); opacity:0; }
-      to{ transform: translateY(0); opacity:1; }
-    }
-
-    .final{
-      margin-top:auto;
-      padding-top:10px;
-      font-size: 15px;
-      color: rgba(255,255,255,0.85);
-    }
-    .final b{
-      color: var(--soft);
-      text-shadow: 0 0 22px rgba(255,214,222,0.24);
-    }
-
-    /* loader overlay */
-    .loader{
-      position:fixed; inset:0;
-      background: radial-gradient(900px 600px at 50% 20%, rgba(255,45,85,0.18), transparent 60%),
-                  linear-gradient(180deg, #05040a, #0e0612);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      z-index:50;
-      padding:22px;
-    }
-    .loaderCard{
-      width:min(560px, 100%);
-      border-radius: 22px;
-      border:1px solid rgba(255,255,255,0.14);
-      background: rgba(255,255,255,0.05);
-      box-shadow: var(--shadow);
-      padding:22px;
-      text-align:center;
-    }
-    .loaderTitle{
-      font-size: 20px;
-      margin: 2px 0 10px 0;
-      letter-spacing:.2px;
-    }
-    .barWrap{
-      width:100%;
-      height: 12px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.08);
-      border:1px solid rgba(255,255,255,0.12);
-      overflow:hidden;
-    }
-    .bar{
-      height:100%;
-      width:0%;
-      background: linear-gradient(90deg, rgba(255,45,85,0.95), rgba(255,214,222,0.75));
-      box-shadow: var(--glow);
-      transition: width 220ms ease;
-    }
-    .loaderText{
-      margin: 10px 0 0 0;
-      color: rgba(255,255,255,0.7);
-      font-size: 14px;
-      line-height:1.4;
-    }
-    .skip{
-      margin-top: 14px;
-      background: transparent;
-      border:1px solid rgba(255,255,255,0.18);
-      color: rgba(255,255,255,0.9);
-      border-radius: 999px;
-      padding: 10px 14px;
-      cursor:pointer;
-    }
-  </style>
+.final{
+ margin-top:20px;
+ font-size:22px;
+ color:#ffd6de;
+}
+</style>
 </head>
 
 <body>
-  <!-- floating hearts -->
-  <div class="hearts" aria-hidden="true" id="hearts"></div>
 
-  <!-- loader -->
-  <div class="loader" id="loader">
-    <div class="loaderCard">
-      <div class="badge" style="justify-content:center; margin: 0 auto 10px auto;">
-        <div class="dot"></div>
-        <div>Unwrapping something special…</div>
-      </div>
-      <div class="loaderTitle">Hold on… dramatic entrance loading 🌹</div>
-      <div class="barWrap"><div class="bar" id="bar"></div></div>
-      <p class="loaderText" id="loaderText">Preparing your bouquet…</p>
-      <button class="skip" id="skipBtn" type="button">Skip the wait</button>
-    </div>
-  </div>
+<!-- LOADER -->
+<div id="loader">
+<h2>Preparing your bouquet… 🌹</h2>
+<div class="barwrap"><div class="bar" id="bar"></div></div>
+</div>
 
-  <main class="card" role="main">
-    <div class="top">
-      <div>
-        <div class="badge"><div class="dot"></div><div>Private • Just for you</div></div>
-        <h1 class="title">Open your surprise</h1>
-        <p class="subtitle">
-          A little bouquet to say what I’m thinking… without saying it all at once.
-        </p>
-      </div>
-    </div>
+<div class="card">
 
-    <section class="content">
-      <div class="frame">
-        <!-- High-quality roses image (Unsplash). You can swap to your own image URL if you prefer. -->
-        <img id="roseImg"
-          alt="Bouquet of red roses"
-          src="https://images.unsplash.com/photo-1518895949257-7621c3c786d7?auto=format&fit=crop&w=1800&q=85"
-          loading="eager"
-          decoding="async"
-        />
-        <div class="caption">
-          <span>For you. Always. 🌹</span>
-          <span style="opacity:.75;">tap the button →</span>
-        </div>
-      </div>
+<h1>Open your surprise</h1>
 
-      <aside class="panel">
-        <button class="btn" id="openBtn" type="button">Open your surprise 💌</button>
+<div class="bouquet">
+<img id="roseImg"
+src="https://images.unsplash.com/photo-1548095115-45697e6c9f86?auto=format&fit=crop&w=2000&q=90"
+alt="Large bouquet of red roses">
+</div>
 
-        <div class="note">
-          Tiny instruction: when you hit “Open”, read it slowly.
-          <br/>No rushing. This part is for teasing the moment.
-        </div>
+<button onclick="openSurprise()">Open your surprise 💌</button>
 
-        <div class="reveal" id="reveal">
-          <div style="font-size:16px; line-height:1.5; color:rgba(255,255,255,0.92);">
-            I wish I could hand these to you in person…<br/>
-            so I’m sending them the next best way.
-            <br/><br/>
-            <b style="color:var(--soft);">One bouquet.</b> One thought.
-            <br/>
-            <span style="opacity:.9;">You.</span>
-          </div>
+<div id="message">
+I couldn't just send one rose...
 
-          <div style="margin-top:12px; padding:12px 12px; border-radius:14px; background: rgba(255,45,85,0.10); border:1px solid rgba(255,214,222,0.20);">
-            <div style="font-weight:700; letter-spacing:.2px;">Final note:</div>
-            <div style="margin-top:6px; font-size:15px;">
-              <b>Answer your phone.</b> 🙂
-            </div>
-          </div>
-        </div>
+<br><br>
+So I sent you a whole bouquet.<br>
+Not 3.<br>
+Not 5.<br>
+Not 10.<br>
 
-        <div class="final">
-          If you’re smiling right now… good. That was the plan.
-        </div>
-      </aside>
-    </section>
-  </main>
+<b>Fifteen roses — for every thought of you.</b>
 
-  <script>
-    // hearts
-    (function(){
-      const wrap = document.getElementById('hearts');
-      const n = 18;
-      for(let i=0;i<n;i++){
-        const h = document.createElement('div');
-        h.className = 'heart';
-        const left = Math.random()*100;
-        const dur = 8 + Math.random()*10;
-        const delay = Math.random()*6;
-        const size = 10 + Math.random()*10;
-        h.style.left = left + 'vw';
-        h.style.bottom = (-10 - Math.random()*30) + 'px';
-        h.style.animationDuration = dur + 's';
-        h.style.animationDelay = delay + 's';
-        h.style.width = size + 'px';
-        h.style.height = size + 'px';
-        wrap.appendChild(h);
-      }
-    })();
+<div class="final">
+Answer your phone. 🙂
+</div>
+</div>
 
-    // fake "slow loading" loader + real image readiness
-    const loader = document.getElementById('loader');
-    const bar = document.getElementById('bar');
-    const loaderText = document.getElementById('loaderText');
-    const skipBtn = document.getElementById('skipBtn');
-    const img = document.getElementById('roseImg');
+</div>
 
-    let pct = 0;
-    let done = false;
+<script>
+// slow dramatic loading
+let bar=document.getElementById("bar");
+let load=0;
 
-    function finish(){
-      if(done) return;
-      done = true;
-      bar.style.width = '100%';
-      setTimeout(()=> {
-        loader.style.display = 'none';
-        // fade in image nicely
-        img.style.opacity = '1';
-      }, 350);
-    }
+let timer=setInterval(()=>{
+ load+=Math.random()*6;
+ if(load>95) load=95;
+ bar.style.width=load+"%";
+},200);
 
-    // simulate slow progress
-    const lines = [
-      "Choosing the reddest roses…",
-      "Tying the ribbon…",
-      "Adding a little magic…",
-      "Almost ready…"
-    ];
-    let li = 0;
+let img=document.getElementById("roseImg");
+img.onload=()=>{
+ clearInterval(timer);
+ bar.style.width="100%";
+ setTimeout(()=>{
+   document.getElementById("loader").style.display="none";
+   img.style.opacity=1;
+   createPetals();
+ },900);
+};
 
-    const timer = setInterval(() => {
-      // slow progress with small random increments
-      pct += (3 + Math.random()*6);
-      if(pct > 92) pct = 92; // don't reach 100 until finish()
-      bar.style.width = pct.toFixed(0) + '%';
-      if(li < lines.length && pct > (20 + li*20)){
-        loaderText.textContent = lines[li];
-        li++;
-      }
-    }, 260);
+// petals
+function createPetals(){
+ for(let i=0;i<25;i++){
+  let p=document.createElement("div");
+  p.className="petal";
+  p.style.left=Math.random()*100+"vw";
+  p.style.animationDuration=6+Math.random()*6+"s";
+  p.style.opacity=Math.random();
+  document.body.appendChild(p);
+ }
+}
 
-    // real image load event helps ensure it’s actually ready
-    img.addEventListener('load', () => {
-      // keep it dramatic: wait a tiny bit even if fast
-      setTimeout(() => { clearInterval(timer); finish(); }, 900);
-    });
-    img.addEventListener('error', () => {
-      clearInterval(timer);
-      loaderText.textContent = "Hmm… roses got shy. Try refreshing.";
-      // still allow skipping
-    });
+// reveal message
+function openSurprise(){
+ document.getElementById("message").style.display="block";
+ window.scrollTo({top:document.body.scrollHeight,behavior:"smooth"});
+}
+</script>
 
-    skipBtn.addEventListener('click', () => {
-      clearInterval(timer);
-      finish();
-    });
-
-    // reveal message
-    document.getElementById('openBtn').addEventListener('click', () => {
-      const r = document.getElementById('reveal');
-      r.style.display = 'block';
-      r.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    });
-  </script>
 </body>
 </html>
