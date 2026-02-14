@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Your Roses 🌹</title>
 
-<!-- helps speed up Unsplash -->
 <link rel="preconnect" href="https://images.unsplash.com">
 <link rel="preconnect" href="https://plus.unsplash.com">
 
@@ -22,117 +21,82 @@ body{
 
 /* LOADER */
 #loader{
- position:fixed;
- inset:0;
- background:#050207;
- display:flex;
- align-items:center;
- justify-content:center;
- flex-direction:column;
- z-index:100;
+  position:fixed;
+  inset:0;
+  background:#050207;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  z-index:100;
 }
-
 .barwrap{
- width:260px;
- height:10px;
- background:#222;
- border-radius:20px;
- overflow:hidden;
- margin-top:15px;
+  width:260px;height:10px;background:#222;border-radius:20px;overflow:hidden;margin-top:15px;
 }
-
 .bar{
- height:100%;
- width:0%;
- background:linear-gradient(90deg,#ff2d55,#ff9bb0);
- transition:width .25s;
+  height:100%;width:0%;
+  background:linear-gradient(90deg,#ff2d55,#ff9bb0);
+  transition:width .2s;
 }
 
-/* MAIN CARD */
-.card{
- max-width:900px;
- margin:60px auto;
- padding:30px;
- text-align:center;
-}
+/* MAIN */
+.card{ max-width:900px; margin:60px auto; padding:30px; text-align:center; }
 
-/* BIG BOUQUET IMAGE */
 .bouquet{
- position:relative;
- width:100%;
- border-radius:18px;
- overflow:hidden;
- box-shadow:0 25px 80px rgba(255,45,85,.25);
+  position:relative;
+  width:100%;
+  border-radius:18px;
+  overflow:hidden;
+  box-shadow:0 25px 80px rgba(255,45,85,.25);
+}
+
+/* Keep layout stable even before image shows */
+.bouquet::before{
+  content:"";
+  display:block;
+  padding-top:56.25%; /* 16:9 placeholder space */
+  background: radial-gradient(circle at 30% 30%, rgba(255,45,85,.18), rgba(0,0,0,.65));
 }
 
 .bouquet img{
- width:100%;
- display:block;
- opacity:0;
- transition:opacity 1.2s ease;
+  position:absolute; inset:0;
+  width:100%; height:100%;
+  object-fit:cover;
+  display:block;
+  opacity:0;
+  transition:opacity 1.2s ease;
 }
 
-/* graceful placeholder if image fails */
-.placeholder{
-  width:100%;
-  aspect-ratio: 16/9;
-  display:grid;
-  place-items:center;
-  background: radial-gradient(circle at 30% 30%, rgba(255,45,85,.25), rgba(0,0,0,.7));
-  border-radius:18px;
-  color:#ffd6de;
-  font-size:18px;
-}
-
-/* FALLING PETALS */
 .petal{
- position:fixed;
- width:18px;
- height:18px;
- background:radial-gradient(circle,#ff4b6e,#c4002c);
- border-radius:50% 50% 50% 0;
- transform:rotate(45deg);
- animation:fall linear infinite;
- opacity:.7;
+  position:fixed;
+  width:18px; height:18px;
+  background:radial-gradient(circle,#ff4b6e,#c4002c);
+  border-radius:50% 50% 50% 0;
+  transform:rotate(45deg);
+  animation:fall linear infinite;
+  opacity:.7;
 }
-
 @keyframes fall{
- from{transform:translateY(-10vh) rotate(0deg);}
- to{transform:translateY(110vh) rotate(360deg);}
+  from{transform:translateY(-10vh) rotate(0deg);}
+  to{transform:translateY(110vh) rotate(360deg);}
 }
 
-/* BUTTON */
 button{
- margin-top:25px;
- padding:14px 26px;
- font-size:18px;
- border:none;
- border-radius:30px;
- background:linear-gradient(135deg,#ff2d55,#ff7a95);
- color:white;
- cursor:pointer;
- box-shadow:0 10px 40px rgba(255,45,85,.4);
-}
-
-/* MESSAGE */
-#message{
- display:none;
- margin-top:25px;
- font-size:20px;
- line-height:1.6;
-}
-
-.final{
- margin-top:20px;
- font-size:22px;
- color:#ffd6de;
+  margin-top:25px;
+  padding:14px 26px;
+  font-size:18px;
+  border:none;
+  border-radius:30px;
+  background:linear-gradient(135deg,#ff2d55,#ff7a95);
+  color:white;
+  cursor:pointer;
+  box-shadow:0 10px 40px rgba(255,45,85,.4);
 }
 </style>
 </head>
 
 <body>
 
-<!-- LOADER -->
 <div id="loader">
   <h2>Preparing your bouquet… 🌹</h2>
   <div class="barwrap"><div class="bar" id="bar"></div></div>
@@ -141,112 +105,86 @@ button{
 <div class="card">
   <h1>Open your surprise</h1>
 
-  <div class="bouquet" id="bouquetWrap">
+  <div class="bouquet">
     <img id="roseImg"
       alt="Large bouquet of red roses"
       decoding="async"
       fetchpriority="high"
-      src="https://images.unsplash.com/photo-1548095115-45697e6c9f86?auto=format&fit=crop&w=1400&q=75"
+      src="https://images.unsplash.com/photo-1548095115-45697e6c9f86?auto=format&fit=crop&w=1400&q=70"
       srcset="
-        https://images.unsplash.com/photo-1548095115-45697e6c9f86?auto=format&fit=crop&w=800&q=70 800w,
-        https://images.unsplash.com/photo-1548095115-45697e6c9f86?auto=format&fit=crop&w=1400&q=75 1400w,
-        https://images.unsplash.com/photo-1548095115-45697e6c9f86?auto=format&fit=crop&w=2000&q=80 2000w
+        https://images.unsplash.com/photo-1548095115-45697e6c9f86?auto=format&fit=crop&w=800&q=65 800w,
+        https://images.unsplash.com/photo-1548095115-45697e6c9f86?auto=format&fit=crop&w=1400&q=70 1400w,
+        https://images.unsplash.com/photo-1548095115-45697e6c9f86?auto=format&fit=crop&w=2000&q=75 2000w
       "
       sizes="(max-width: 900px) 92vw, 900px"
     >
   </div>
 
   <button onclick="window.location.href='call.html'">Answer your surprise 💌</button>
-
-  <div id="message">
-    I couldn't just send one rose...
-    <br><br>
-    So I sent you a whole bouquet.<br>
-    Not 3.<br>
-    Not 5.<br>
-    Not 10.<br>
-    <b>Fifteen roses — for every thought of you.</b>
-
-    <div class="final">
-      Answer your phone. 🙂
-    </div>
-  </div>
 </div>
 
 <script>
-const bar = document.getElementById("bar");
-const loader = document.getElementById("loader");
-const img = document.getElementById("roseImg");
-const bouquetWrap = document.getElementById("bouquetWrap");
+(function () {
+  const loader = document.getElementById("loader");
+  const bar = document.getElementById("bar");
+  const img = document.getElementById("roseImg");
 
-let load = 0;
-let done = false;
+  // If anything is missing, just don't block the user
+  if (!loader || !bar || !img) return;
 
-// visual progress (fake, but nice)
-const timer = setInterval(() => {
-  load += Math.random() * 7;
-  if (load > 92) load = 92;
-  bar.style.width = load + "%";
-}, 180);
+  let done = false;
+  let load = 0;
 
-// ALWAYS finish loader (never stuck)
-function finishLoader({showImage=true} = {}) {
-  if (done) return;
-  done = true;
+  // Progress animation (purely visual)
+  const timer = setInterval(() => {
+    load += Math.random() * 9;
+    if (load > 96) load = 96;
+    bar.style.width = load + "%";
+  }, 150);
 
-  clearInterval(timer);
-  bar.style.width = "100%";
-
-  setTimeout(() => {
-    loader.style.display = "none";
-    if (showImage) img.style.opacity = 1;
-    createPetals();
-  }, 350);
-}
-
-// If image loads: decode then reveal
-img.addEventListener("load", async () => {
-  try {
-    if (img.decode) await img.decode();
-  } catch (e) { /* ignore decode issues */ }
-  finishLoader({showImage:true});
-});
-
-// If image fails: show placeholder + continue
-img.addEventListener("error", () => {
-  // Replace with a cute placeholder so layout stays beautiful
-  bouquetWrap.innerHTML = `
-    <div class="placeholder">
-      Roses are on the way… 🌹 (your connection is being shy)
-    </div>
-  `;
-  finishLoader({showImage:false});
-});
-
-// Hard timeout safety (e.g., slow network / blocked CDN)
-setTimeout(() => {
-  if (!done) finishLoader({showImage:true});
-}, 4500);
-
-// petals
-function createPetals(){
-  // keep it light: fewer particles on slower devices
-  const count = 18;
-  for(let i=0;i<count;i++){
-    const p=document.createElement("div");
-    p.className="petal";
-    p.style.left=Math.random()*100+"vw";
-    p.style.animationDuration=6+Math.random()*6+"s";
-    p.style.opacity=(0.35 + Math.random()*0.55).toFixed(2);
-    document.body.appendChild(p);
+  function finishLoader() {
+    if (done) return;
+    done = true;
+    clearInterval(timer);
+    bar.style.width = "100%";
+    setTimeout(() => {
+      loader.style.display = "none";
+      createPetals();
+    }, 250);
   }
-}
 
-// reveal message (unused currently, but kept)
-function openSurprise(){
-  document.getElementById("message").style.display="block";
-  window.scrollTo({top:document.body.scrollHeight,behavior:"smooth"});
-}
+  // ✅ KEY FIX: hide loader when DOM is ready (NOT waiting for image)
+  document.addEventListener("DOMContentLoaded", () => {
+    // give a tiny moment so the animation feels intentional
+    setTimeout(finishLoader, 700);
+  });
+
+  // Hard safety timeout (network issues / JS delays)
+  setTimeout(finishLoader, 2500);
+
+  // Image fades in whenever it finishes (or not)
+  img.addEventListener("load", async () => {
+    try { if (img.decode) await img.decode(); } catch(e) {}
+    img.style.opacity = 1;
+  });
+
+  // If image fails, still show something (keep it beautiful)
+  img.addEventListener("error", () => {
+    img.style.opacity = 0; // keep gradient placeholder from ::before
+  });
+
+  function createPetals() {
+    const count = 18;
+    for (let i = 0; i < count; i++) {
+      const p = document.createElement("div");
+      p.className = "petal";
+      p.style.left = Math.random() * 100 + "vw";
+      p.style.animationDuration = (6 + Math.random() * 6) + "s";
+      p.style.opacity = (0.35 + Math.random() * 0.55).toFixed(2);
+      document.body.appendChild(p);
+    }
+  }
+})();
 </script>
 
 </body>
