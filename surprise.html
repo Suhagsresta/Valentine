@@ -5,12 +5,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Your Roses 🌹</title>
 
-<link rel="preconnect" href="https://images.unsplash.com">
-<link rel="preconnect" href="https://plus.unsplash.com">
-
 <style>
 :root{ --rose:#ff2d55; }
-
 body{
   margin:0;
   font-family:system-ui;
@@ -18,67 +14,32 @@ body{
   color:white;
   overflow-x:hidden;
 }
-
-/* LOADER */
 #loader{
-  position:fixed;
-  inset:0;
+  position:fixed; inset:0;
   background:#050207;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  flex-direction:column;
+  display:flex; align-items:center; justify-content:center; flex-direction:column;
   z-index:100;
 }
-.barwrap{
-  width:260px;height:10px;background:#222;border-radius:20px;overflow:hidden;margin-top:15px;
-}
-.bar{
-  height:100%;width:0%;
-  background:linear-gradient(90deg,#ff2d55,#ff9bb0);
-  transition:width .2s;
-}
+.barwrap{ width:260px;height:10px;background:#222;border-radius:20px;overflow:hidden;margin-top:15px; }
+.bar{ height:100%;width:0%; background:linear-gradient(90deg,#ff2d55,#ff9bb0); transition:width .2s; }
 
-/* MAIN */
 .card{ max-width:900px; margin:60px auto; padding:30px; text-align:center; }
 
 .bouquet{
-  position:relative;
-  width:100%;
-  border-radius:18px;
-  overflow:hidden;
+  position:relative; width:100%;
+  border-radius:18px; overflow:hidden;
   box-shadow:0 25px 80px rgba(255,45,85,.25);
 }
-
-/* Keep layout stable even before image shows */
 .bouquet::before{
-  content:"";
-  display:block;
-  padding-top:56.25%; /* 16:9 placeholder space */
+  content:""; display:block; padding-top:56.25%;
   background: radial-gradient(circle at 30% 30%, rgba(255,45,85,.18), rgba(0,0,0,.65));
 }
-
 .bouquet img{
   position:absolute; inset:0;
   width:100%; height:100%;
   object-fit:cover;
-  display:block;
   opacity:0;
   transition:opacity 1.2s ease;
-}
-
-.petal{
-  position:fixed;
-  width:18px; height:18px;
-  background:radial-gradient(circle,#ff4b6e,#c4002c);
-  border-radius:50% 50% 50% 0;
-  transform:rotate(45deg);
-  animation:fall linear infinite;
-  opacity:.7;
-}
-@keyframes fall{
-  from{transform:translateY(-10vh) rotate(0deg);}
-  to{transform:translateY(110vh) rotate(360deg);}
 }
 
 button{
@@ -106,16 +67,12 @@ button{
   <h1>Open your surprise</h1>
 
   <div class="bouquet">
-   <img id="roseImg"
-  src="./images/roses.jpg"
-  alt="Bouquet of 15 red roses"
-  decoding="async"
-  loading="eager"
-  fetchpriority="high"
-  referrerpolicy="no-referrer">
-
-
-
+    <img id="roseImg"
+      src="./roses.jpg"
+      alt="Bouquet of 15 red roses"
+      decoding="async"
+      loading="eager"
+      fetchpriority="high">
   </div>
 
   <button onclick="window.location.href='call.html'">Answer your surprise 💌</button>
@@ -126,16 +83,14 @@ button{
   const loader = document.getElementById("loader");
   const bar = document.getElementById("bar");
   const img = document.getElementById("roseImg");
-
-  // If loader elements missing, don't block anything
   if (!loader || !bar || !img) return;
 
-  // Progress animation (visual only)
-  let progress = 0;
+  // progress animation
+  let p = 0;
   const timer = setInterval(() => {
-    progress += Math.random() * 10;
-    if (progress > 95) progress = 95;
-    bar.style.width = progress + "%";
+    p += Math.random() * 10;
+    if (p > 95) p = 95;
+    bar.style.width = p + "%";
   }, 140);
 
   let finished = false;
@@ -144,50 +99,31 @@ button{
     finished = true;
     clearInterval(timer);
     bar.style.width = "100%";
-    setTimeout(() => (loader.style.display = "none"), 250);
+    setTimeout(() => loader.style.display = "none", 200);
   }
 
-  // ✅ KEY: Hide loader when DOM is ready (do NOT wait on image)
-  document.addEventListener("DOMContentLoaded", () => {
-    setTimeout(finishLoader, 700);
-  });
-
-  // Hard safety timeout (never get stuck)
-  setTimeout(finishLoader, 2500);
-
-  // ---- Image loading + fallbacks ----
-  const sources = [
-    "./images/roses.jpg", // IMPORTANT: make sure filename matches exactly (case-sensitive on GitHub)
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f6/Rose_bouquet.jpg/1600px-Rose_bouquet.jpg",
-    "https://source.unsplash.com/1600x900/?red-roses,bouquet"
-  ];
-
-  let idx = 0;
-
-  function tryNextSource() {
-    idx++;
-    if (idx < sources.length) {
-      img.src = sources[idx];
-    } else {
-      // nothing worked: keep the nice gradient placeholder and stop
-      console.warn("All bouquet image sources failed.");
-    }
+  // ✅ hide loader even if DOMContentLoaded already happened
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", () => setTimeout(finishLoader, 600));
+  } else {
+    setTimeout(finishLoader, 600);
   }
 
-  img.addEventListener("load", () => {
-    img.style.opacity = 1;
-  });
+  // hard safety timeout
+  setTimeout(finishLoader, 2200);
 
+  // image fade in
+  img.addEventListener("load", () => { img.style.opacity = 1; });
   img.addEventListener("error", () => {
-    tryNextSource();
+    // If local image missing, show something instead of blank
+    img.style.opacity = 0;
+    console.warn("roses.jpg not found. Put roses.jpg in same folder as surprise.html");
   });
 
-  // Force initial src (in case browser cached an earlier failed src)
-  img.src = sources[0];
+  // force reload the image src (helps if browser cached a fail)
+  img.src = img.getAttribute("src") + "?v=" + Date.now();
 })();
 </script>
-
-
 
 </body>
 </html>
